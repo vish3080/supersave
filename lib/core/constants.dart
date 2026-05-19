@@ -1,9 +1,22 @@
 import 'package:flutter/material.dart';
 
-// Replace these with your actual Supabase credentials.
-// Supabase Dashboard → your project → Settings → API
-const String supabaseUrl = 'YOUR_SUPABASE_PROJECT_URL';
-const String supabaseAnonKey = 'YOUR_SUPABASE_ANON_KEY';
+// Credentials are injected at build time via --dart-define.
+// Never hardcode real values here — use the run commands below.
+//
+// Local dev:
+//   flutter run -d chrome \
+//     --dart-define=SUPABASE_URL=https://xxxx.supabase.co \
+//     --dart-define=SUPABASE_ANON_KEY=eyJhbGc...
+//
+// CI/CD: set SUPABASE_URL and SUPABASE_ANON_KEY in GitHub Secrets.
+const String supabaseUrl = String.fromEnvironment(
+  'SUPABASE_URL',
+  defaultValue: 'YOUR_SUPABASE_PROJECT_URL',
+);
+const String supabaseAnonKey = String.fromEnvironment(
+  'SUPABASE_ANON_KEY',
+  defaultValue: 'YOUR_SUPABASE_ANON_KEY',
+);
 
 class PresetCategory {
   final String name;
