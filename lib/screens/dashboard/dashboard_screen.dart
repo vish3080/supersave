@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart' hide Category;
+import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:provider/provider.dart';
 import '../../providers/finance_provider.dart';
@@ -366,7 +366,7 @@ class _GoalRow extends StatelessWidget {
             child: LinearProgressIndicator(
               value: goal.progress,
               minHeight: 6,
-              backgroundColor: Colors.blue.withOpacity(0.15),
+              backgroundColor: Colors.blue.withValues(alpha: 0.15),
               valueColor: const AlwaysStoppedAnimation<Color>(Colors.blue),
             ),
           ),
@@ -438,6 +438,7 @@ class _AddIncomeSheetState extends State<_AddIncomeSheet> {
             autofocus: true,
           ),
           const SizedBox(height: 12),
+          // ignore: deprecated_member_use
           DropdownButtonFormField<String>(
             value: _source,
             decoration: const InputDecoration(labelText: 'Source'),

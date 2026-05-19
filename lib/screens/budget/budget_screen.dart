@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart' hide Category;
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/finance_provider.dart';
 import '../../models/models.dart';
@@ -103,7 +103,7 @@ class _CategoryBudgetCard extends StatelessWidget {
                   child: LinearProgressIndicator(
                     value: fp.budgetProgress(cat),
                     minHeight: 7,
-                    backgroundColor: cat.color.withOpacity(0.15),
+                    backgroundColor: cat.color.withValues(alpha: 0.15),
                     valueColor: AlwaysStoppedAnimation<Color>(
                       fp.isOverBudget(cat)
                           ? Colors.red
@@ -306,8 +306,8 @@ class _AddCategorySheetState extends State<_AddCategorySheet> {
                     height: 44,
                     decoration: BoxDecoration(
                       color: isSelected
-                          ? _selectedColor.withOpacity(0.2)
-                          : Colors.grey.withOpacity(0.1),
+                          ? _selectedColor.withValues(alpha: 0.2)
+                          : Colors.grey.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                       border: isSelected
                           ? Border.all(color: _selectedColor, width: 2)
@@ -341,7 +341,8 @@ class _AddCategorySheetState extends State<_AddCategorySheet> {
                       boxShadow: isSelected
                           ? [
                               BoxShadow(
-                                  color: c.withOpacity(0.5), blurRadius: 6)
+                                  color: c.withValues(alpha: 0.5),
+                                  blurRadius: 6)
                             ]
                           : null,
                     ),

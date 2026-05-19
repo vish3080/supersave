@@ -6,8 +6,12 @@ Color colorFromHex(String hex) {
   return Color(int.parse('FF$code', radix: 16));
 }
 
-String colorToHex(Color color) =>
-    color.value.toRadixString(16).substring(2).toUpperCase();
+String colorToHex(Color color) {
+  final r = (color.r * 255).round().toRadixString(16).padLeft(2, '0');
+  final g = (color.g * 255).round().toRadixString(16).padLeft(2, '0');
+  final b = (color.b * 255).round().toRadixString(16).padLeft(2, '0');
+  return '$r$g$b'.toUpperCase();
+}
 
 // ── Income Entry ─────────────────────────────────────────────────────────────
 class IncomeEntry {

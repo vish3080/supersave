@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart' hide Category;
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../core/constants.dart';
 import '../models/models.dart';
@@ -72,7 +72,7 @@ Widget categoryIconWidget(Category cat, {double size = 20}) {
     width: size + 16,
     height: size + 16,
     decoration: BoxDecoration(
-      color: cat.color.withOpacity(0.15),
+      color: cat.color.withValues(alpha: 0.15),
       shape: BoxShape.circle,
     ),
     child: Icon(categoryIconData(cat.iconKey), color: cat.color, size: size),
@@ -100,7 +100,9 @@ class CategoryChip extends StatelessWidget {
         duration: const Duration(milliseconds: 150),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? category.color : category.color.withOpacity(0.1),
+          color: isSelected
+              ? category.color
+              : category.color.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(20),
         ),
         child: Row(
@@ -184,7 +186,7 @@ class BudgetProgressRow extends StatelessWidget {
               borderRadius: BorderRadius.circular(4),
               child: LinearProgressIndicator(
                 value: progress,
-                backgroundColor: barColor.withOpacity(0.15),
+                backgroundColor: barColor.withValues(alpha: 0.15),
                 valueColor: AlwaysStoppedAnimation<Color>(barColor),
                 minHeight: 6,
               ),

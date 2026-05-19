@@ -27,7 +27,6 @@ class AuthProvider extends ChangeNotifier {
           _userId = data.session?.user.id;
           break;
         case AuthChangeEvent.signedOut:
-        case AuthChangeEvent.userDeleted:
           _isAuthenticated = false;
           _userId = null;
           break;

@@ -140,7 +140,7 @@ class _GoalCardState extends State<_GoalCard> {
               child: LinearProgressIndicator(
                 value: goal.progress,
                 minHeight: 10,
-                backgroundColor: Colors.blue.withOpacity(0.15),
+                backgroundColor: Colors.blue.withValues(alpha: 0.15),
                 valueColor: const AlwaysStoppedAnimation<Color>(Colors.blue),
               ),
             ),
