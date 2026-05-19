@@ -30,16 +30,13 @@ class FinanceProvider extends ChangeNotifier {
 
   DateTime get selectedMonthDate => DateTime(_selectedYear, _selectedMonth);
 
-  double get totalIncome =>
-      _income.fold(0, (sum, e) => sum + e.amount);
+  double get totalIncome => _income.fold(0, (sum, e) => sum + e.amount);
 
-  double get totalExpenses =>
-      _expenses.fold(0, (sum, e) => sum + e.amount);
+  double get totalExpenses => _expenses.fold(0, (sum, e) => sum + e.amount);
 
   double get savings => totalIncome - totalExpenses;
 
-  double get savingsRate =>
-      totalIncome > 0 ? savings / totalIncome : 0;
+  double get savingsRate => totalIncome > 0 ? savings / totalIncome : 0;
 
   List<CategorySpend> get categorySpending {
     if (totalExpenses == 0) return [];
@@ -60,8 +57,9 @@ class FinanceProvider extends ChangeNotifier {
     return result;
   }
 
-  double budgetUsed(Category cat) =>
-      _expenses.where((e) => e.categoryId == cat.id).fold(0, (s, e) => s + e.amount);
+  double budgetUsed(Category cat) => _expenses
+      .where((e) => e.categoryId == cat.id)
+      .fold(0, (s, e) => s + e.amount);
 
   double budgetProgress(Category cat) {
     if (cat.budgetLimit == null || cat.budgetLimit! <= 0) return 0;

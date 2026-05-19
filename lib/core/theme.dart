@@ -11,7 +11,8 @@ class AppTheme {
         ),
         cardTheme: CardThemeData(
           elevation: 0,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           color: Colors.white,
         ),
         appBarTheme: const AppBarTheme(
@@ -32,7 +33,8 @@ class AppTheme {
         ),
         cardTheme: CardThemeData(
           elevation: 0,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         ),
         appBarTheme: const AppBarTheme(
           centerTitle: false,

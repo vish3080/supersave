@@ -50,8 +50,7 @@ class SavingsScreen extends StatelessWidget {
                         style: TextStyle(
                             fontWeight: FontWeight.bold, color: Colors.grey)),
                   ),
-                  ...completed
-                      .map((g) => _CompletedGoalCard(goal: g, fp: fp)),
+                  ...completed.map((g) => _CompletedGoalCard(goal: g, fp: fp)),
                 ],
                 const SizedBox(height: 80),
               ],
@@ -115,8 +114,8 @@ class _GoalCardState extends State<_GoalCard> {
                       if (goal.deadline != null)
                         Text(
                           'Due: ${goal.deadline!.day}/${goal.deadline!.month}/${goal.deadline!.year}',
-                          style: const TextStyle(
-                              fontSize: 12, color: Colors.grey),
+                          style:
+                              const TextStyle(fontSize: 12, color: Colors.grey),
                         ),
                     ],
                   ),
@@ -142,20 +141,17 @@ class _GoalCardState extends State<_GoalCard> {
                 value: goal.progress,
                 minHeight: 10,
                 backgroundColor: Colors.blue.withOpacity(0.15),
-                valueColor:
-                    const AlwaysStoppedAnimation<Color>(Colors.blue),
+                valueColor: const AlwaysStoppedAnimation<Color>(Colors.blue),
               ),
             ),
             const SizedBox(height: 6),
             Row(
               children: [
                 Text('${formatCurrency(goal.currentAmount)} saved',
-                    style:
-                        const TextStyle(fontSize: 12, color: Colors.grey)),
+                    style: const TextStyle(fontSize: 12, color: Colors.grey)),
                 const Spacer(),
                 Text('${formatCurrency(goal.remaining)} to go',
-                    style:
-                        const TextStyle(fontSize: 12, color: Colors.grey)),
+                    style: const TextStyle(fontSize: 12, color: Colors.grey)),
               ],
             ),
             const SizedBox(height: 10),
@@ -165,14 +161,14 @@ class _GoalCardState extends State<_GoalCard> {
                   Expanded(
                     child: TextField(
                       controller: _depositCtrl,
-                      keyboardType: const TextInputType.numberWithOptions(
-                          decimal: true),
+                      keyboardType:
+                          const TextInputType.numberWithOptions(decimal: true),
                       decoration: const InputDecoration(
                         hintText: 'Amount',
                         prefixText: '\$ ',
                         isDense: true,
-                        contentPadding: EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 10),
+                        contentPadding:
+                            EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                       ),
                       autofocus: true,
                     ),
@@ -180,8 +176,7 @@ class _GoalCardState extends State<_GoalCard> {
                   const SizedBox(width: 8),
                   FilledButton(
                     onPressed: () async {
-                      final amount =
-                          double.tryParse(_depositCtrl.text);
+                      final amount = double.tryParse(_depositCtrl.text);
                       if (amount != null && amount > 0) {
                         await widget.fp.depositToGoal(goal, amount);
                         _depositCtrl.clear();
@@ -250,8 +245,7 @@ class _AddGoalSheetState extends State<_AddGoalSheet> {
   final _nameCtrl = TextEditingController();
   final _targetCtrl = TextEditingController();
   bool _hasDeadline = false;
-  DateTime _deadline =
-      DateTime.now().add(const Duration(days: 180));
+  DateTime _deadline = DateTime.now().add(const Duration(days: 180));
 
   @override
   void dispose() {
@@ -285,8 +279,7 @@ class _AddGoalSheetState extends State<_AddGoalSheet> {
           const SizedBox(height: 12),
           TextField(
             controller: _targetCtrl,
-            keyboardType:
-                const TextInputType.numberWithOptions(decimal: true),
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
             decoration: const InputDecoration(
               labelText: 'Target Amount',
               prefixText: '\$ ',
@@ -312,8 +305,7 @@ class _AddGoalSheetState extends State<_AddGoalSheet> {
                   context: context,
                   initialDate: _deadline,
                   firstDate: DateTime.now(),
-                  lastDate: DateTime.now()
-                      .add(const Duration(days: 3650)),
+                  lastDate: DateTime.now().add(const Duration(days: 3650)),
                 );
                 if (picked != null) setState(() => _deadline = picked);
               },
@@ -328,8 +320,7 @@ class _AddGoalSheetState extends State<_AddGoalSheet> {
                   : () async {
                       await widget.fp.addSavingsGoal(
                         name: _nameCtrl.text.trim(),
-                        targetAmount:
-                            double.parse(_targetCtrl.text),
+                        targetAmount: double.parse(_targetCtrl.text),
                         deadline: _hasDeadline ? _deadline : null,
                       );
                       if (context.mounted) Navigator.pop(context);

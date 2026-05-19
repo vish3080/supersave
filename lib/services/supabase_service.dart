@@ -73,12 +73,10 @@ class FinanceService {
   // Expenses
   Future<List<Expense>> fetchExpenses(
       String userId, int month, int year) async {
-    final startDate =
-        '$year-${month.toString().padLeft(2, '0')}-01';
+    final startDate = '$year-${month.toString().padLeft(2, '0')}-01';
     final endMonth = month == 12 ? 1 : month + 1;
     final endYear = month == 12 ? year + 1 : year;
-    final endDate =
-        '$endYear-${endMonth.toString().padLeft(2, '0')}-01';
+    final endDate = '$endYear-${endMonth.toString().padLeft(2, '0')}-01';
 
     final data = await _db
         .from('expenses')

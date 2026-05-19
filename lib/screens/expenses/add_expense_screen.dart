@@ -78,7 +78,8 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                 controller: _amountCtrl,
                 keyboardType:
                     const TextInputType.numberWithOptions(decimal: true),
-                style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                style:
+                    const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
                 decoration: const InputDecoration(
                   prefixText: '\$ ',
                   hintText: '0.00',
@@ -100,8 +101,8 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text('Category',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 14)),
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                   const SizedBox(height: 10),
                   fp.categories.isEmpty
                       ? const Text('No categories found.',
@@ -112,8 +113,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                           children: fp.categories
                               .map<Widget>((cat) => CategoryChip(
                                     category: cat,
-                                    isSelected:
-                                        _selectedCategoryId == cat.id,
+                                    isSelected: _selectedCategoryId == cat.id,
                                     onTap: () => setState(
                                         () => _selectedCategoryId = cat.id),
                                   ))
@@ -164,7 +164,8 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                   SwitchListTile(
                     contentPadding: EdgeInsets.zero,
                     title: const Text('Recurring'),
-                    subtitle: const Text('Mark as a subscription or regular bill'),
+                    subtitle:
+                        const Text('Mark as a subscription or regular bill'),
                     value: _isRecurring,
                     onChanged: (v) => setState(() => _isRecurring = v),
                   ),

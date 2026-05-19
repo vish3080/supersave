@@ -96,8 +96,9 @@ class _AuthScreenState extends State<AuthScreen> {
                         labelText: 'Email',
                         prefixIcon: Icon(Icons.email_outlined),
                       ),
-                      validator: (v) =>
-                          (v == null || !v.contains('@')) ? 'Enter a valid email' : null,
+                      validator: (v) => (v == null || !v.contains('@'))
+                          ? 'Enter a valid email'
+                          : null,
                     ),
                     const SizedBox(height: 12),
 
@@ -115,8 +116,8 @@ class _AuthScreenState extends State<AuthScreen> {
                           icon: Icon(_obscurePassword
                               ? Icons.visibility_off
                               : Icons.visibility),
-                          onPressed: () =>
-                              setState(() => _obscurePassword = !_obscurePassword),
+                          onPressed: () => setState(
+                              () => _obscurePassword = !_obscurePassword),
                         ),
                       ),
                       validator: (v) => (v == null || v.length < 6)
@@ -135,9 +136,8 @@ class _AuthScreenState extends State<AuthScreen> {
                           labelText: 'Confirm Password',
                           prefixIcon: Icon(Icons.lock_outline),
                         ),
-                        validator: (v) => (v == null || v.isEmpty)
-                            ? 'Required'
-                            : null,
+                        validator: (v) =>
+                            (v == null || v.isEmpty) ? 'Required' : null,
                       ),
                     ],
 
@@ -153,7 +153,8 @@ class _AuthScreenState extends State<AuthScreen> {
                             ? const SizedBox(
                                 width: 20,
                                 height: 20,
-                                child: CircularProgressIndicator(strokeWidth: 2),
+                                child:
+                                    CircularProgressIndicator(strokeWidth: 2),
                               )
                             : Text(_isSignUp ? 'Create Account' : 'Sign In'),
                       ),

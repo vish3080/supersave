@@ -19,8 +19,7 @@ class SettingsScreen extends StatelessWidget {
           const SizedBox(height: 12),
           ListTile(
             leading: CircleAvatar(
-              backgroundColor:
-                  Theme.of(context).colorScheme.primaryContainer,
+              backgroundColor: Theme.of(context).colorScheme.primaryContainer,
               child: Icon(Icons.person,
                   color: Theme.of(context).colorScheme.primary),
             ),
@@ -51,20 +50,18 @@ class SettingsScreen extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.info_outline),
             title: const Text('Version'),
-            trailing: const Text('1.0.0',
-                style: TextStyle(color: Colors.grey)),
+            trailing: const Text('1.0.0', style: TextStyle(color: Colors.grey)),
           ),
           ListTile(
             leading: const Icon(Icons.cloud_outlined),
             title: const Text('Backend'),
-            trailing: const Text('Supabase',
-                style: TextStyle(color: Colors.grey)),
+            trailing:
+                const Text('Supabase', style: TextStyle(color: Colors.grey)),
           ),
           const Divider(),
           ListTile(
             leading: const Icon(Icons.logout, color: Colors.red),
-            title: const Text('Sign Out',
-                style: TextStyle(color: Colors.red)),
+            title: const Text('Sign Out', style: TextStyle(color: Colors.red)),
             onTap: () => showDialog(
               context: context,
               builder: (ctx) => AlertDialog(
@@ -79,8 +76,7 @@ class SettingsScreen extends StatelessWidget {
                       Navigator.pop(ctx);
                       auth.signOut();
                     },
-                    style:
-                        FilledButton.styleFrom(backgroundColor: Colors.red),
+                    style: FilledButton.styleFrom(backgroundColor: Colors.red),
                     child: const Text('Sign Out'),
                   ),
                 ],
@@ -104,12 +100,11 @@ class _StatTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: Icon(icon,
-          color: Theme.of(context).colorScheme.primary),
+      leading: Icon(icon, color: Theme.of(context).colorScheme.primary),
       title: Text(label),
       trailing: Text(value,
-          style: const TextStyle(
-              fontWeight: FontWeight.bold, color: Colors.grey)),
+          style:
+              const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
     );
   }
 }

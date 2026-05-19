@@ -136,12 +136,11 @@ class _CategoryBudgetCard extends StatelessWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text('Delete "${cat.name}"?'),
-        content: const Text(
-            'This will also remove all expenses in this category.'),
+        content:
+            const Text('This will also remove all expenses in this category.'),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: const Text('Cancel')),
+              onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
           FilledButton(
             onPressed: () {
               fp.deleteCategory(cat);
@@ -206,8 +205,7 @@ class _EditBudgetSheetState extends State<_EditBudgetSheet> {
           const SizedBox(height: 16),
           TextField(
             controller: _ctrl,
-            keyboardType:
-                const TextInputType.numberWithOptions(decimal: true),
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
             decoration: const InputDecoration(
               labelText: 'Monthly Budget Limit',
               prefixText: '\$ ',
@@ -341,7 +339,10 @@ class _AddCategorySheetState extends State<_AddCategorySheet> {
                           ? Border.all(color: Colors.white, width: 3)
                           : null,
                       boxShadow: isSelected
-                          ? [BoxShadow(color: c.withOpacity(0.5), blurRadius: 6)]
+                          ? [
+                              BoxShadow(
+                                  color: c.withOpacity(0.5), blurRadius: 6)
+                            ]
                           : null,
                     ),
                   ),

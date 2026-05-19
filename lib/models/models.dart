@@ -169,7 +169,8 @@ class Expense {
         'category_id': categoryId,
         'amount': amount,
         'note': note,
-        'date': '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}',
+        'date':
+            '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}',
         'is_recurring': isRecurring,
         'recurring_interval': recurringInterval?.value,
         'created_at': createdAt.toIso8601String(),
@@ -200,7 +201,8 @@ class SavingsGoal {
 
   double get progress =>
       targetAmount > 0 ? (currentAmount / targetAmount).clamp(0.0, 1.0) : 0;
-  double get remaining => (targetAmount - currentAmount).clamp(0, double.infinity);
+  double get remaining =>
+      (targetAmount - currentAmount).clamp(0, double.infinity);
 
   factory SavingsGoal.fromJson(Map<String, dynamic> j) => SavingsGoal(
         id: j['id'] as String,
@@ -208,8 +210,9 @@ class SavingsGoal {
         name: j['name'] as String,
         targetAmount: (j['target_amount'] as num).toDouble(),
         currentAmount: (j['current_amount'] as num).toDouble(),
-        deadline:
-            j['deadline'] != null ? DateTime.parse(j['deadline'] as String) : null,
+        deadline: j['deadline'] != null
+            ? DateTime.parse(j['deadline'] as String)
+            : null,
         isCompleted: j['is_completed'] as bool? ?? false,
         createdAt: DateTime.parse(j['created_at'] as String),
       );
@@ -227,7 +230,8 @@ class SavingsGoal {
         'created_at': createdAt.toIso8601String(),
       };
 
-  SavingsGoal copyWith({double? currentAmount, bool? isCompleted}) => SavingsGoal(
+  SavingsGoal copyWith({double? currentAmount, bool? isCompleted}) =>
+      SavingsGoal(
         id: id,
         userId: userId,
         name: name,

@@ -84,7 +84,8 @@ class _MonthNavigator extends StatelessWidget {
               child: Text(
                 formatMonthYear(fp.selectedMonthDate),
                 textAlign: TextAlign.center,
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                style:
+                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
             ),
             IconButton(
@@ -264,8 +265,7 @@ class _SpendingChartState extends State<_SpendingChart> {
                       ),
                     ),
                     const SizedBox(width: 4),
-                    Text(s.category.name,
-                        style: const TextStyle(fontSize: 12)),
+                    Text(s.category.name, style: const TextStyle(fontSize: 12)),
                     const SizedBox(width: 4),
                     Text(formatPercent(s.percentage),
                         style: const TextStyle(
@@ -288,7 +288,8 @@ class _BudgetCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final withBudget = fp.categories.where((c) => c.budgetLimit != null).toList();
+    final withBudget =
+        fp.categories.where((c) => c.budgetLimit != null).toList();
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -319,7 +320,8 @@ class _SavingsSnapshot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final active = fp.savingsGoals.where((g) => !g.isCompleted).take(3).toList();
+    final active =
+        fp.savingsGoals.where((g) => !g.isCompleted).take(3).toList();
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -372,12 +374,10 @@ class _GoalRow extends StatelessWidget {
           Row(
             children: [
               Text('${formatCurrency(goal.currentAmount)} saved',
-                  style:
-                      const TextStyle(fontSize: 11, color: Colors.grey)),
+                  style: const TextStyle(fontSize: 11, color: Colors.grey)),
               const Spacer(),
               Text('${formatCurrency(goal.remaining)} to go',
-                  style:
-                      const TextStyle(fontSize: 11, color: Colors.grey)),
+                  style: const TextStyle(fontSize: 11, color: Colors.grey)),
             ],
           ),
         ],
@@ -398,7 +398,14 @@ class _AddIncomeSheet extends StatefulWidget {
 class _AddIncomeSheetState extends State<_AddIncomeSheet> {
   final _amountCtrl = TextEditingController();
   String _source = 'Salary';
-  final _sources = ['Salary', 'Freelance', 'Business', 'Investment', 'Gift', 'Other'];
+  final _sources = [
+    'Salary',
+    'Freelance',
+    'Business',
+    'Investment',
+    'Gift',
+    'Other'
+  ];
 
   @override
   void dispose() {
@@ -457,4 +464,3 @@ class _AddIncomeSheetState extends State<_AddIncomeSheet> {
     );
   }
 }
-

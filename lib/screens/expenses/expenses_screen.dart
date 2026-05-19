@@ -44,7 +44,8 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.receipt_long_outlined, size: 64, color: Colors.grey),
+                  Icon(Icons.receipt_long_outlined,
+                      size: 64, color: Colors.grey),
                   SizedBox(height: 12),
                   Text('No expenses yet',
                       style: TextStyle(color: Colors.grey, fontSize: 16)),
@@ -146,8 +147,8 @@ class _ExpenseTile extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           Text(formatCurrency(expense.amount),
-              style: const TextStyle(
-                  fontWeight: FontWeight.bold, fontSize: 15)),
+              style:
+                  const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
           Text(
             '${expense.date.day}/${expense.date.month}/${expense.date.year}',
             style: const TextStyle(fontSize: 11, color: Colors.grey),
