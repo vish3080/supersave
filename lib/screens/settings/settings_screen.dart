@@ -47,16 +47,15 @@ class SettingsScreen extends StatelessWidget {
               label: 'Total saved this month',
               value: formatCurrency(fp.savings)),
           const Divider(),
-          ListTile(
-            leading: const Icon(Icons.info_outline),
-            title: const Text('Version'),
-            trailing: const Text('1.0.0', style: TextStyle(color: Colors.grey)),
+          const ListTile(
+            leading: Icon(Icons.info_outline),
+            title: Text('Version'),
+            trailing: Text('1.0.0', style: TextStyle(color: Colors.grey)),
           ),
-          ListTile(
-            leading: const Icon(Icons.cloud_outlined),
-            title: const Text('Backend'),
-            trailing:
-                const Text('Supabase', style: TextStyle(color: Colors.grey)),
+          const ListTile(
+            leading: Icon(Icons.cloud_outlined),
+            title: Text('Backend'),
+            trailing: Text('Supabase', style: TextStyle(color: Colors.grey)),
           ),
           const Divider(),
           ListTile(
