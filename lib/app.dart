@@ -3,6 +3,10 @@ import 'package:provider/provider.dart';
 import 'core/theme.dart';
 import 'providers/auth_provider.dart';
 import 'providers/finance_provider.dart';
+import 'providers/wealth_provider.dart';
+import 'providers/bills_provider.dart';
+import 'providers/subscription_provider.dart';
+import 'providers/premium_provider.dart';
 import 'screens/auth/auth_screen.dart';
 import 'screens/home/home_screen.dart';
 
@@ -15,6 +19,10 @@ class SuperSaveApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => FinanceProvider()),
+        ChangeNotifierProvider(create: (_) => WealthProvider()),
+        ChangeNotifierProvider(create: (_) => BillsProvider()),
+        ChangeNotifierProvider(create: (_) => SubscriptionProvider()),
+        ChangeNotifierProvider(create: (_) => PremiumProvider()),
       ],
       child: MaterialApp(
         title: 'SuperSave',
@@ -33,17 +41,19 @@ class _RootRouter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
-    final fp = context.read<FinanceProvider>();
 
     if (!auth.isAuthenticated) {
       return const AuthScreen();
     }
 
-    // Load finance data once authenticated
+    // Load all data once authenticated
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (auth.userId != null) {
-        fp.loadAll(auth.userId!);
-      }
+      final uid = auth.userId!;
+      context.read<FinanceProvider>().loadAll(uid);
+      context.read<WealthProvider>().loadAll(uid);
+      context.read<BillsProvider>().loadAll(uid);
+      context.read<SubscriptionProvider>().loadAll(uid);
+      context.read<PremiumProvider>().checkPremium();
     });
 
     return const HomeScreen();

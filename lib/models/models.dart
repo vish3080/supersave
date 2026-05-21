@@ -247,6 +247,297 @@ class SavingsGoal {
       );
 }
 
+// ── Asset ─────────────────────────────────────────────────────────────────────
+class Asset {
+  final String id;
+  final String userId;
+  final String name;
+  final String type; // bank | investment | property | vehicle | crypto | other
+  final double value;
+  final String? notes;
+  final DateTime createdAt;
+
+  const Asset({
+    required this.id,
+    required this.userId,
+    required this.name,
+    required this.type,
+    required this.value,
+    this.notes,
+    required this.createdAt,
+  });
+
+  factory Asset.fromJson(Map<String, dynamic> j) => Asset(
+        id: j['id'] as String,
+        userId: j['user_id'] as String,
+        name: j['name'] as String,
+        type: j['type'] as String? ?? 'other',
+        value: (j['value'] as num).toDouble(),
+        notes: j['notes'] as String?,
+        createdAt: DateTime.parse(j['created_at'] as String),
+      );
+
+  Map<String, dynamic> toInsert() => {
+        'user_id': userId,
+        'name': name,
+        'type': type,
+        'value': value,
+        'notes': notes,
+      };
+
+  Map<String, dynamic> toJson() => toInsert();
+}
+
+// ── Debt ──────────────────────────────────────────────────────────────────────
+class Debt {
+  final String id;
+  final String userId;
+  final String name;
+  final String
+      type; // credit_card | student_loan | mortgage | auto_loan | personal_loan | other
+  final double balance;
+  final double interestRate; // APR %
+  final double minimumPayment;
+  final int? dueDay;
+  final DateTime createdAt;
+
+  const Debt({
+    required this.id,
+    required this.userId,
+    required this.name,
+    required this.type,
+    required this.balance,
+    required this.interestRate,
+    required this.minimumPayment,
+    this.dueDay,
+    required this.createdAt,
+  });
+
+  factory Debt.fromJson(Map<String, dynamic> j) => Debt(
+        id: j['id'] as String,
+        userId: j['user_id'] as String,
+        name: j['name'] as String,
+        type: j['type'] as String? ?? 'other',
+        balance: (j['balance'] as num).toDouble(),
+        interestRate: (j['interest_rate'] as num).toDouble(),
+        minimumPayment: (j['minimum_payment'] as num).toDouble(),
+        dueDay: j['due_day'] as int?,
+        createdAt: DateTime.parse(j['created_at'] as String),
+      );
+
+  Map<String, dynamic> toInsert() => {
+        'user_id': userId,
+        'name': name,
+        'type': type,
+        'balance': balance,
+        'interest_rate': interestRate,
+        'minimum_payment': minimumPayment,
+        'due_day': dueDay,
+      };
+
+  Map<String, dynamic> toJson() => toInsert();
+
+  Debt copyWith({double? balance}) => Debt(
+        id: id,
+        userId: userId,
+        name: name,
+        type: type,
+        balance: balance ?? this.balance,
+        interestRate: interestRate,
+        minimumPayment: minimumPayment,
+        dueDay: dueDay,
+        createdAt: createdAt,
+      );
+}
+
+// ── Bill ──────────────────────────────────────────────────────────────────────
+class Bill {
+  final String id;
+  final String userId;
+  final String name;
+  final double amount;
+  final int dueDay; // 1-31
+  final bool isAutopay;
+  final String? notes;
+  final DateTime createdAt;
+
+  const Bill({
+    required this.id,
+    required this.userId,
+    required this.name,
+    required this.amount,
+    required this.dueDay,
+    required this.isAutopay,
+    this.notes,
+    required this.createdAt,
+  });
+
+  factory Bill.fromJson(Map<String, dynamic> j) => Bill(
+        id: j['id'] as String,
+        userId: j['user_id'] as String,
+        name: j['name'] as String,
+        amount: (j['amount'] as num).toDouble(),
+        dueDay: j['due_day'] as int,
+        isAutopay: j['is_autopay'] as bool? ?? false,
+        notes: j['notes'] as String?,
+        createdAt: DateTime.parse(j['created_at'] as String),
+      );
+
+  Map<String, dynamic> toInsert() => {
+        'user_id': userId,
+        'name': name,
+        'amount': amount,
+        'due_day': dueDay,
+        'is_autopay': isAutopay,
+        'notes': notes,
+      };
+
+  Map<String, dynamic> toJson() => toInsert();
+
+  int get daysUntilDue {
+    final now = DateTime.now();
+    final thisMonth = DateTime(now.year, now.month, dueDay);
+    final nextMonth = DateTime(now.year, now.month + 1, dueDay);
+    if (thisMonth.isAfter(now) || thisMonth.day == now.day) {
+      return thisMonth.difference(now).inDays;
+    }
+    return nextMonth.difference(now).inDays;
+  }
+
+  bool get isOverdue {
+    final now = DateTime.now();
+    return dueDay < now.day;
+  }
+
+  bool get isDueSoon => daysUntilDue <= 7 && !isOverdue;
+}
+
+// ── Subscription ──────────────────────────────────────────────────────────────
+class Subscription {
+  final String id;
+  final String userId;
+  final String name;
+  final double amount;
+  final String billingCycle; // weekly | monthly | yearly
+  final bool isActive;
+  final DateTime? nextChargeDate;
+  final String? notes;
+  final DateTime createdAt;
+
+  const Subscription({
+    required this.id,
+    required this.userId,
+    required this.name,
+    required this.amount,
+    required this.billingCycle,
+    required this.isActive,
+    this.nextChargeDate,
+    this.notes,
+    required this.createdAt,
+  });
+
+  double get monthlyEquivalent {
+    switch (billingCycle) {
+      case 'weekly':
+        return amount * 4.33;
+      case 'yearly':
+        return amount / 12;
+      default:
+        return amount;
+    }
+  }
+
+  factory Subscription.fromJson(Map<String, dynamic> j) => Subscription(
+        id: j['id'] as String,
+        userId: j['user_id'] as String,
+        name: j['name'] as String,
+        amount: (j['amount'] as num).toDouble(),
+        billingCycle: j['billing_cycle'] as String? ?? 'monthly',
+        isActive: j['is_active'] as bool? ?? true,
+        nextChargeDate: j['next_charge_date'] != null
+            ? DateTime.parse(j['next_charge_date'] as String)
+            : null,
+        notes: j['notes'] as String?,
+        createdAt: DateTime.parse(j['created_at'] as String),
+      );
+
+  Map<String, dynamic> toInsert() => {
+        'user_id': userId,
+        'name': name,
+        'amount': amount,
+        'billing_cycle': billingCycle,
+        'is_active': isActive,
+        'notes': notes,
+      };
+
+  Map<String, dynamic> toJson() => toInsert();
+
+  Subscription copyWith({bool? isActive}) => Subscription(
+        id: id,
+        userId: userId,
+        name: name,
+        amount: amount,
+        billingCycle: billingCycle,
+        isActive: isActive ?? this.isActive,
+        nextChargeDate: nextChargeDate,
+        notes: notes,
+        createdAt: createdAt,
+      );
+}
+
+// ── Linked Account (Plaid) ────────────────────────────────────────────────────
+class LinkedAccount {
+  final String id;
+  final String userId;
+  final String institutionName;
+  final String accountName;
+  final String accountType; // checking | savings | credit | investment
+  final String? mask;
+  final double? currentBalance;
+  final DateTime? lastSyncedAt;
+
+  const LinkedAccount({
+    required this.id,
+    required this.userId,
+    required this.institutionName,
+    required this.accountName,
+    required this.accountType,
+    this.mask,
+    this.currentBalance,
+    this.lastSyncedAt,
+  });
+
+  factory LinkedAccount.fromJson(Map<String, dynamic> j) => LinkedAccount(
+        id: j['id'] as String,
+        userId: j['user_id'] as String,
+        institutionName: j['institution_name'] as String,
+        accountName: j['account_name'] as String,
+        accountType: j['account_type'] as String? ?? 'checking',
+        mask: j['mask'] as String?,
+        currentBalance: j['current_balance'] != null
+            ? (j['current_balance'] as num).toDouble()
+            : null,
+        lastSyncedAt: j['last_synced_at'] != null
+            ? DateTime.parse(j['last_synced_at'] as String)
+            : null,
+      );
+}
+
+// ── Chat Message ──────────────────────────────────────────────────────────────
+class ChatMessage {
+  final String role; // 'user' | 'assistant'
+  final String content;
+  final DateTime timestamp;
+
+  const ChatMessage({
+    required this.role,
+    required this.content,
+    required this.timestamp,
+  });
+
+  bool get isUser => role == 'user';
+}
+
 // ── Aggregates ────────────────────────────────────────────────────────────────
 class CategorySpend {
   final Category category;
