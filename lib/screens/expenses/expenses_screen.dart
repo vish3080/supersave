@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import '../../core/theme.dart';
 import '../../providers/finance_provider.dart';
 import '../../models/models.dart';
 import '../../widgets/common_widgets.dart';
@@ -18,6 +20,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
   @override
   Widget build(BuildContext context) {
     final fp = context.watch<FinanceProvider>();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final filtered = fp.expenses
         .where((e) =>
             _search.isEmpty ||
@@ -28,89 +31,133 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
       appBar: AppBar(
         title: const Text('Expenses'),
         bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(56),
+          preferredSize: const Size.fromHeight(64),
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-            child: SearchBar(
-              hintText: 'Search expenses…',
-              leading: const Icon(Icons.search),
-              onChanged: (v) => setState(() => _search = v),
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+            child: Container(
+              height: 46,
+              decoration: BoxDecoration(
+                color: isDark ? AppColors.cardDark : const Color(0xFFF1F3FF),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(
+                  color: isDark
+                      ? Colors.white.withValues(alpha: 0.06)
+                      : const Color(0xFFE0E0FF),
+                  width: 1,
+                ),
+              ),
+              child: TextField(
+                onChanged: (v) => setState(() => _search = v),
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 14,
+                  color: isDark ? Colors.white : const Color(0xFF1A1A2E),
+                ),
+                decoration: InputDecoration(
+                  hintText: 'Search expenses…',
+                  hintStyle: GoogleFonts.plusJakartaSans(
+                      fontSize: 14, color: Colors.grey.withValues(alpha: 0.6)),
+                  prefixIcon: Icon(Icons.search_rounded,
+                      size: 20, color: Colors.grey.withValues(alpha: 0.6)),
+                  border: InputBorder.none,
+                  enabledBorder: InputBorder.none,
+                  focusedBorder: InputBorder.none,
+                  contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                  filled: false,
+                ),
+              ),
             ),
           ),
         ),
       ),
       body: fp.expenses.isEmpty
-          ? const Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.receipt_long_outlined,
-                      size: 64, color: Colors.grey),
-                  SizedBox(height: 12),
-                  Text('No expenses yet',
-                      style: TextStyle(color: Colors.grey, fontSize: 16)),
-                  SizedBox(height: 4),
-                  Text('Tap + to add your first expense.',
-                      style: TextStyle(color: Colors.grey)),
-                ],
-              ),
-            )
-          : ListView.separated(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              itemCount: filtered.length,
-              separatorBuilder: (_, __) => const Divider(height: 1, indent: 72),
-              itemBuilder: (context, i) {
-                final expense = filtered[i];
-                return Dismissible(
-                  key: Key(expense.id),
-                  direction: DismissDirection.endToStart,
-                  background: Container(
-                    alignment: Alignment.centerRight,
-                    padding: const EdgeInsets.only(right: 20),
-                    color: Colors.red,
-                    child: const Icon(Icons.delete, color: Colors.white),
+          ? _EmptyState()
+          : filtered.isEmpty
+              ? Center(
+                  child: Text(
+                    'No results for "$_search"',
+                    style: GoogleFonts.plusJakartaSans(color: Colors.grey),
                   ),
-                  confirmDismiss: (_) async {
-                    return await showDialog<bool>(
-                      context: context,
-                      builder: (ctx) => AlertDialog(
-                        title: const Text('Delete Expense'),
-                        content: const Text('Are you sure?'),
-                        actions: [
-                          TextButton(
-                              onPressed: () => Navigator.pop(ctx, false),
-                              child: const Text('Cancel')),
-                          FilledButton(
-                              onPressed: () => Navigator.pop(ctx, true),
-                              child: const Text('Delete')),
-                        ],
+                )
+              : ListView.builder(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 100),
+                  itemCount: filtered.length,
+                  itemBuilder: (context, i) {
+                    final expense = filtered[i];
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 10),
+                      child: Dismissible(
+                        key: Key(expense.id),
+                        direction: DismissDirection.endToStart,
+                        background: Container(
+                          alignment: Alignment.centerRight,
+                          padding: const EdgeInsets.only(right: 24),
+                          decoration: BoxDecoration(
+                            gradient: AppColors.gradientExpense,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: const Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.delete_rounded,
+                                  color: Colors.white, size: 22),
+                              SizedBox(height: 2),
+                              Text('Delete',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w600)),
+                            ],
+                          ),
+                        ),
+                        confirmDismiss: (_) async {
+                          return await showDialog<bool>(
+                            context: context,
+                            builder: (ctx) => AlertDialog(
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20)),
+                              title: Text('Delete Expense',
+                                  style: GoogleFonts.plusJakartaSans(
+                                      fontWeight: FontWeight.w700)),
+                              content: const Text('Are you sure?'),
+                              actions: [
+                                TextButton(
+                                    onPressed: () => Navigator.pop(ctx, false),
+                                    child: const Text('Cancel')),
+                                FilledButton(
+                                  onPressed: () => Navigator.pop(ctx, true),
+                                  style: FilledButton.styleFrom(
+                                      backgroundColor: AppColors.expense),
+                                  child: const Text('Delete'),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                        onDismissed: (_) => fp.deleteExpense(expense),
+                        child: _ExpenseTile(expense: expense, fp: fp),
                       ),
                     );
                   },
-                  onDismissed: (_) => fp.deleteExpense(expense),
-                  child: _ExpenseTile(expense: expense, fp: fp),
-                );
-              },
-            ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => Navigator.push(
+                ),
+      floatingActionButton: _AddFAB(
+        onTap: () => Navigator.push(
           context,
           MaterialPageRoute(builder: (_) => const AddExpenseScreen()),
         ),
-        child: const Icon(Icons.add),
       ),
     );
   }
 }
 
+// ── Expense Tile ──────────────────────────────────────────────────────────────
 class _ExpenseTile extends StatelessWidget {
   final Expense expense;
   final FinanceProvider fp;
-
   const _ExpenseTile({required this.expense, required this.fp});
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final cat = fp.categories.firstWhere(
       (c) => c.id == expense.categoryId,
       orElse: () => Category(
@@ -123,37 +170,162 @@ class _ExpenseTile extends StatelessWidget {
       ),
     );
 
-    return ListTile(
-      leading: categoryIconWidget(cat),
-      title: Text(
-        expense.note.isEmpty ? cat.name : expense.note,
-        style: const TextStyle(fontWeight: FontWeight.w500),
-      ),
-      subtitle: Row(
+    return AppCard(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Row(
         children: [
-          Text(cat.name,
-              style: const TextStyle(fontSize: 12, color: Colors.grey)),
-          if (expense.isRecurring) ...[
-            const SizedBox(width: 6),
-            const Icon(Icons.repeat, size: 12, color: Colors.blue),
-            const SizedBox(width: 2),
-            Text(expense.recurringInterval?.label ?? 'Recurring',
-                style: const TextStyle(fontSize: 11, color: Colors.blue)),
-          ],
-        ],
-      ),
-      trailing: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          Text(formatCurrency(expense.amount),
-              style:
-                  const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-          Text(
-            '${expense.date.day}/${expense.date.month}/${expense.date.year}',
-            style: const TextStyle(fontSize: 11, color: Colors.grey),
+          categoryIconWidget(cat, size: 20),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  expense.note.isEmpty ? cat.name : expense.note,
+                  style: GoogleFonts.plusJakartaSans(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                    color: isDark ? Colors.white : const Color(0xFF1A1A2E),
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Row(
+                  children: [
+                    Text(
+                      cat.name,
+                      style: GoogleFonts.plusJakartaSans(
+                          fontSize: 12, color: Colors.grey),
+                    ),
+                    if (expense.isRecurring) ...[
+                      const SizedBox(width: 6),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.repeat_rounded,
+                                size: 10, color: AppColors.primary),
+                            const SizedBox(width: 3),
+                            Text(
+                              expense.recurringInterval?.label ?? 'Recurring',
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ],
+            ),
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                formatCurrency(expense.amount),
+                style: GoogleFonts.plusJakartaSans(
+                  fontWeight: FontWeight.w800,
+                  fontSize: 15,
+                  color: AppColors.expense,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                '${expense.date.day}/${expense.date.month}/${expense.date.year}',
+                style: GoogleFonts.plusJakartaSans(
+                    fontSize: 11, color: Colors.grey),
+              ),
+            ],
           ),
         ],
+      ),
+    );
+  }
+}
+
+// ── Empty State ───────────────────────────────────────────────────────────────
+class _EmptyState extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 96,
+            height: 96,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  AppColors.primary.withValues(alpha: 0.15),
+                  AppColors.primary.withValues(alpha: 0.05),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(Icons.receipt_long_outlined,
+                size: 44, color: AppColors.primary.withValues(alpha: 0.5)),
+          ),
+          const SizedBox(height: 20),
+          Text(
+            'No expenses yet',
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              color: isDark ? Colors.white : const Color(0xFF1A1A2E),
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            'Tap + to log your first expense',
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 14,
+              color: Colors.grey,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Gradient FAB ──────────────────────────────────────────────────────────────
+class _AddFAB extends StatelessWidget {
+  final VoidCallback onTap;
+  const _AddFAB({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 58,
+        height: 58,
+        decoration: BoxDecoration(
+          gradient: AppColors.gradientPrimary,
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.primary.withValues(alpha: 0.45),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: const Icon(Icons.add_rounded, color: Colors.white, size: 28),
       ),
     );
   }

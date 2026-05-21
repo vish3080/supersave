@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import '../../core/theme.dart';
 import '../../providers/finance_provider.dart';
 import '../../models/models.dart';
 import '../../widgets/common_widgets.dart';
@@ -12,52 +14,60 @@ class SavingsScreen extends StatelessWidget {
     final fp = context.watch<FinanceProvider>();
     final active = fp.savingsGoals.where((g) => !g.isCompleted).toList();
     final completed = fp.savingsGoals.where((g) => g.isCompleted).toList();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Savings Goals')),
       body: fp.savingsGoals.isEmpty
-          ? const Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.savings_outlined, size: 64, color: Colors.grey),
-                  SizedBox(height: 12),
-                  Text('No savings goals yet',
-                      style: TextStyle(color: Colors.grey, fontSize: 16)),
-                  SizedBox(height: 4),
-                  Text('Tap + to create your first goal.',
-                      style: TextStyle(color: Colors.grey)),
-                ],
-              ),
-            )
+          ? _EmptyState()
           : ListView(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 100),
               children: [
                 if (active.isNotEmpty) ...[
-                  const Padding(
-                    padding: EdgeInsets.only(left: 4, bottom: 8),
-                    child: Text('Active',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, color: Colors.grey)),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 4, bottom: 10),
+                    child: Text(
+                      'Active Goals',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: isDark
+                            ? Colors.white.withValues(alpha: 0.5)
+                            : Colors.grey,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
                   ),
-                  ...active.map((g) => _GoalCard(goal: g, fp: fp)),
+                  ...active.map((g) => Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: _GoalCard(goal: g, fp: fp),
+                      )),
                 ],
                 if (completed.isNotEmpty) ...[
-                  const SizedBox(height: 16),
-                  const Padding(
-                    padding: EdgeInsets.only(left: 4, bottom: 8),
-                    child: Text('Completed',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, color: Colors.grey)),
+                  const SizedBox(height: 8),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 4, bottom: 10),
+                    child: Text(
+                      'Completed',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: isDark
+                            ? Colors.white.withValues(alpha: 0.5)
+                            : Colors.grey,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
                   ),
-                  ...completed.map((g) => _CompletedGoalCard(goal: g, fp: fp)),
+                  ...completed.map((g) => Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: _CompletedGoalCard(goal: g, fp: fp),
+                      )),
                 ],
-                const SizedBox(height: 80),
               ],
             ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _showAddGoalSheet(context, fp),
-        child: const Icon(Icons.add),
+      floatingActionButton: _AddFAB(
+        onTap: () => _showAddGoalSheet(context, fp),
       ),
     );
   }
@@ -66,8 +76,7 @@ class SavingsScreen extends StatelessWidget {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      backgroundColor: Colors.transparent,
       builder: (_) => _AddGoalSheet(fp: fp),
     );
   }
@@ -96,117 +105,248 @@ class _GoalCardState extends State<_GoalCard> {
   @override
   Widget build(BuildContext context) {
     final goal = widget.goal;
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(goal.name,
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 16)),
-                      if (goal.deadline != null)
-                        Text(
-                          'Due: ${goal.deadline!.day}/${goal.deadline!.month}/${goal.deadline!.year}',
-                          style:
-                              const TextStyle(fontSize: 12, color: Colors.grey),
-                        ),
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final progress = goal.progress.clamp(0.0, 1.0);
+
+    return AppCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              // Icon
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  gradient: AppColors.gradientSavings,
+                  borderRadius: BorderRadius.circular(14),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.savings.withValues(alpha: 0.35),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: const Icon(Icons.savings_rounded,
+                    color: Colors.white, size: 22),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      goal.name,
+                      style: GoogleFonts.plusJakartaSans(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 16,
+                        color: isDark ? Colors.white : const Color(0xFF1A1A2E),
+                      ),
+                    ),
+                    if (goal.deadline != null)
+                      Text(
+                        'Due ${goal.deadline!.day}/${goal.deadline!.month}/${goal.deadline!.year}',
+                        style: GoogleFonts.plusJakartaSans(
+                            fontSize: 12, color: Colors.grey),
+                      ),
+                  ],
+                ),
+              ),
+              // Percent badge
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                decoration: BoxDecoration(
+                  gradient: progress >= 1
+                      ? AppColors.gradientIncome
+                      : AppColors.gradientSavings,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  formatPercent(goal.progress),
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 4),
+              GestureDetector(
+                onTap: () => widget.fp.deleteSavingsGoal(goal),
+                child: Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: AppColors.expense.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(Icons.delete_outline_rounded,
+                      color: AppColors.expense.withValues(alpha: 0.7),
+                      size: 18),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+
+          // Progress bar
+          Stack(
+            children: [
+              Container(
+                height: 10,
+                decoration: BoxDecoration(
+                  color: AppColors.savings.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              FractionallySizedBox(
+                widthFactor: progress,
+                child: Container(
+                  height: 10,
+                  decoration: BoxDecoration(
+                    gradient: AppColors.gradientSavings,
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.savings.withValues(alpha: 0.4),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
                     ],
                   ),
                 ),
-                Text(
-                  formatPercent(goal.progress),
-                  style: const TextStyle(
-                      color: Colors.blue,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.delete_outline, color: Colors.grey),
-                  onPressed: () => widget.fp.deleteSavingsGoal(goal),
-                  iconSize: 20,
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(6),
-              child: LinearProgressIndicator(
-                value: goal.progress,
-                minHeight: 10,
-                backgroundColor: Colors.blue.withValues(alpha: 0.15),
-                valueColor: const AlwaysStoppedAnimation<Color>(Colors.blue),
               ),
-            ),
-            const SizedBox(height: 6),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Text(
+                '${formatCurrency(goal.currentAmount)} saved',
+                style: GoogleFonts.plusJakartaSans(
+                    fontSize: 12, color: Colors.grey),
+              ),
+              const Spacer(),
+              Text(
+                '${formatCurrency(goal.remaining)} to go',
+                style: GoogleFonts.plusJakartaSans(
+                    fontSize: 12, color: Colors.grey),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+
+          // Deposit area
+          if (_showDeposit)
             Row(
               children: [
-                Text('${formatCurrency(goal.currentAmount)} saved',
-                    style: const TextStyle(fontSize: 12, color: Colors.grey)),
-                const Spacer(),
-                Text('${formatCurrency(goal.remaining)} to go',
-                    style: const TextStyle(fontSize: 12, color: Colors.grey)),
-              ],
-            ),
-            const SizedBox(height: 10),
-            if (_showDeposit)
-              Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _depositCtrl,
-                      keyboardType:
-                          const TextInputType.numberWithOptions(decimal: true),
-                      decoration: const InputDecoration(
-                        hintText: 'Amount',
-                        prefixText: '\$ ',
-                        isDense: true,
-                        contentPadding:
-                            EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                Expanded(
+                  child: TextField(
+                    controller: _depositCtrl,
+                    keyboardType:
+                        const TextInputType.numberWithOptions(decimal: true),
+                    decoration: const InputDecoration(
+                      hintText: 'Amount',
+                      prefixText: '\$ ',
+                      isDense: true,
+                      contentPadding:
+                          EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    ),
+                    autofocus: true,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                GestureDetector(
+                  onTap: () async {
+                    final amount = double.tryParse(_depositCtrl.text);
+                    if (amount != null && amount > 0) {
+                      await widget.fp.depositToGoal(goal, amount);
+                      _depositCtrl.clear();
+                      setState(() => _showDeposit = false);
+                    }
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 10),
+                    decoration: BoxDecoration(
+                      gradient: AppColors.gradientSavings,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      'Add',
+                      style: GoogleFonts.plusJakartaSans(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 13,
                       ),
-                      autofocus: true,
                     ),
                   ),
-                  const SizedBox(width: 8),
-                  FilledButton(
-                    onPressed: () async {
-                      final amount = double.tryParse(_depositCtrl.text);
-                      if (amount != null && amount > 0) {
-                        await widget.fp.depositToGoal(goal, amount);
-                        _depositCtrl.clear();
-                        setState(() => _showDeposit = false);
-                      }
-                    },
-                    child: const Text('Add'),
+                ),
+                const SizedBox(width: 6),
+                GestureDetector(
+                  onTap: () => setState(() {
+                    _showDeposit = false;
+                    _depositCtrl.clear();
+                  }),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      'Cancel',
+                      style: GoogleFonts.plusJakartaSans(
+                          fontSize: 13, color: Colors.grey),
+                    ),
                   ),
-                  TextButton(
-                    onPressed: () => setState(() {
-                      _showDeposit = false;
-                      _depositCtrl.clear();
-                    }),
-                    child: const Text('Cancel'),
-                  ),
-                ],
-              )
-            else
-              OutlinedButton.icon(
-                onPressed: () => setState(() => _showDeposit = true),
-                icon: const Icon(Icons.add, size: 16),
-                label: const Text('Add Money'),
+                ),
+              ],
+            )
+          else
+            GestureDetector(
+              onTap: () => setState(() => _showDeposit = true),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                decoration: BoxDecoration(
+                  gradient: AppColors.gradientSavings,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.savings.withValues(alpha: 0.3),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.add_rounded,
+                        color: Colors.white, size: 16),
+                    const SizedBox(width: 6),
+                    Text(
+                      'Add Money',
+                      style: GoogleFonts.plusJakartaSans(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-          ],
-        ),
+            ),
+        ],
       ),
     );
   }
 }
 
+// ── Completed Goal Card ───────────────────────────────────────────────────────
 class _CompletedGoalCard extends StatelessWidget {
   final SavingsGoal goal;
   final FinanceProvider fp;
@@ -214,19 +354,105 @@ class _CompletedGoalCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: ListTile(
-        leading: const CircleAvatar(
-          backgroundColor: Colors.green,
-          child: Icon(Icons.check, color: Colors.white),
-        ),
-        title: Text(goal.name,
-            style: const TextStyle(decoration: TextDecoration.lineThrough)),
-        subtitle: Text('Goal reached: ${formatCurrency(goal.targetAmount)}'),
-        trailing: IconButton(
-          icon: const Icon(Icons.delete_outline, color: Colors.grey),
-          onPressed: () => fp.deleteSavingsGoal(goal),
-        ),
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return AppCard(
+      child: Row(
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              gradient: AppColors.gradientIncome,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: const Icon(Icons.check_circle_rounded,
+                color: Colors.white, size: 22),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  goal.name,
+                  style: GoogleFonts.plusJakartaSans(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 15,
+                    color: isDark ? Colors.white70 : Colors.grey.shade600,
+                    decoration: TextDecoration.lineThrough,
+                  ),
+                ),
+                Text(
+                  'Goal reached · ${formatCurrency(goal.targetAmount)}',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 12,
+                    color: AppColors.income,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          GestureDetector(
+            onTap: () => fp.deleteSavingsGoal(goal),
+            child: Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: Colors.grey.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(Icons.delete_outline_rounded,
+                  color: Colors.grey.withValues(alpha: 0.7), size: 18),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Empty State ───────────────────────────────────────────────────────────────
+class _EmptyState extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 96,
+            height: 96,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  AppColors.savings.withValues(alpha: 0.15),
+                  AppColors.savings.withValues(alpha: 0.05),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(Icons.savings_outlined,
+                size: 44, color: AppColors.savings.withValues(alpha: 0.5)),
+          ),
+          const SizedBox(height: 20),
+          Text(
+            'No savings goals yet',
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              color: isDark ? Colors.white : const Color(0xFF1A1A2E),
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            'Tap + to create your first goal',
+            style:
+                GoogleFonts.plusJakartaSans(fontSize: 14, color: Colors.grey),
+          ),
+        ],
       ),
     );
   }
@@ -256,79 +482,186 @@ class _AddGoalSheetState extends State<_AddGoalSheet> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.fromLTRB(
-          24, 24, 24, MediaQuery.of(context).viewInsets.bottom + 24),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('New Savings Goal',
-              style: Theme.of(context)
-                  .textTheme
-                  .titleLarge
-                  ?.copyWith(fontWeight: FontWeight.bold)),
-          const SizedBox(height: 16),
-          TextField(
-            controller: _nameCtrl,
-            decoration: const InputDecoration(
-                labelText: 'Goal Name',
-                hintText: 'e.g. Emergency Fund, Vacation'),
-            onChanged: (_) => setState(() {}),
-          ),
-          const SizedBox(height: 12),
-          TextField(
-            controller: _targetCtrl,
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            decoration: const InputDecoration(
-              labelText: 'Target Amount',
-              prefixText: '\$ ',
-            ),
-          ),
-          const SizedBox(height: 12),
-          SwitchListTile(
-            contentPadding: EdgeInsets.zero,
-            title: const Text('Set a deadline'),
-            value: _hasDeadline,
-            onChanged: (v) => setState(() => _hasDeadline = v),
-          ),
-          if (_hasDeadline)
-            ListTile(
-              contentPadding: EdgeInsets.zero,
-              title: const Text('Target Date'),
-              trailing: Text(
-                '${_deadline.day}/${_deadline.month}/${_deadline.year}',
-                style: const TextStyle(color: Colors.blue),
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return ClipRRect(
+      borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+      child: Container(
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.surfaceDark : Colors.white,
+        ),
+        padding: EdgeInsets.fromLTRB(
+            24, 24, 24, MediaQuery.of(context).viewInsets.bottom + 24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Handle
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey.withValues(alpha: 0.3),
+                  borderRadius: BorderRadius.circular(2),
+                ),
               ),
-              onTap: () async {
-                final picked = await showDatePicker(
-                  context: context,
-                  initialDate: _deadline,
-                  firstDate: DateTime.now(),
-                  lastDate: DateTime.now().add(const Duration(days: 3650)),
-                );
-                if (picked != null) setState(() => _deadline = picked);
-              },
             ),
-          const SizedBox(height: 16),
-          SizedBox(
-            width: double.infinity,
-            child: FilledButton(
-              onPressed: _nameCtrl.text.trim().isEmpty ||
-                      double.tryParse(_targetCtrl.text) == null
-                  ? null
-                  : () async {
-                      await widget.fp.addSavingsGoal(
-                        name: _nameCtrl.text.trim(),
-                        targetAmount: double.parse(_targetCtrl.text),
-                        deadline: _hasDeadline ? _deadline : null,
-                      );
-                      if (context.mounted) Navigator.pop(context);
-                    },
-              child: const Text('Create Goal'),
+            const SizedBox(height: 20),
+            Text(
+              'New Savings Goal',
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 22,
+                fontWeight: FontWeight.w800,
+                color: isDark ? Colors.white : const Color(0xFF1A1A2E),
+              ),
             ),
-          ),
-        ],
+            const SizedBox(height: 20),
+            TextField(
+              controller: _nameCtrl,
+              decoration: const InputDecoration(
+                labelText: 'Goal Name',
+                hintText: 'e.g. Emergency Fund, Vacation',
+              ),
+              onChanged: (_) => setState(() {}),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _targetCtrl,
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
+              decoration: const InputDecoration(
+                labelText: 'Target Amount',
+                prefixText: '\$ ',
+              ),
+            ),
+            const SizedBox(height: 12),
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(
+                'Set a deadline',
+                style: GoogleFonts.plusJakartaSans(
+                    fontWeight: FontWeight.w600, fontSize: 14),
+              ),
+              activeColor: AppColors.primary,
+              value: _hasDeadline,
+              onChanged: (v) => setState(() => _hasDeadline = v),
+            ),
+            if (_hasDeadline)
+              GestureDetector(
+                onTap: () async {
+                  final picked = await showDatePicker(
+                    context: context,
+                    initialDate: _deadline,
+                    firstDate: DateTime.now(),
+                    lastDate: DateTime.now().add(const Duration(days: 3650)),
+                  );
+                  if (picked != null) setState(() => _deadline = picked);
+                },
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                        color: AppColors.primary.withValues(alpha: 0.25),
+                        width: 1),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.calendar_today_outlined,
+                          size: 16, color: AppColors.primary),
+                      const SizedBox(width: 10),
+                      Text(
+                        'Target: ${_deadline.day}/${_deadline.month}/${_deadline.year}',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 14,
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const Spacer(),
+                      const Icon(Icons.edit_outlined,
+                          size: 14, color: AppColors.primary),
+                    ],
+                  ),
+                ),
+              ),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              height: 52,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: AppColors.gradientSavings,
+                  borderRadius: BorderRadius.circular(14),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.savings.withValues(alpha: 0.35),
+                      blurRadius: 16,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                ),
+                child: FilledButton(
+                  onPressed: _nameCtrl.text.trim().isEmpty ||
+                          double.tryParse(_targetCtrl.text) == null
+                      ? null
+                      : () async {
+                          await widget.fp.addSavingsGoal(
+                            name: _nameCtrl.text.trim(),
+                            targetAmount: double.parse(_targetCtrl.text),
+                            deadline: _hasDeadline ? _deadline : null,
+                          );
+                          if (context.mounted) Navigator.pop(context);
+                        },
+                  style: FilledButton.styleFrom(
+                    backgroundColor: Colors.transparent,
+                    disabledBackgroundColor:
+                        Colors.transparent.withValues(alpha: 0),
+                    shadowColor: Colors.transparent,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14)),
+                  ),
+                  child: Text(
+                    'Create Goal',
+                    style: GoogleFonts.plusJakartaSans(
+                        fontWeight: FontWeight.w700, fontSize: 15),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Gradient FAB ──────────────────────────────────────────────────────────────
+class _AddFAB extends StatelessWidget {
+  final VoidCallback onTap;
+  const _AddFAB({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 58,
+        height: 58,
+        decoration: BoxDecoration(
+          gradient: AppColors.gradientSavings,
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.savings.withValues(alpha: 0.45),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: const Icon(Icons.add_rounded, color: Colors.white, size: 28),
       ),
     );
   }
