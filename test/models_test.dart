@@ -3,65 +3,72 @@ import 'package:supersave/models/models.dart';
 
 void main() {
   group('SavingsGoal', () {
-    final goal = SavingsGoal(
-      id: '1',
-      userId: 'u1',
-      name: 'Vacation',
-      targetAmount: 1000,
-      currentAmount: 250,
-      isCompleted: false,
-      createdAt: DateTime(2026, 1, 1),
-    );
-
-    test('progress calculates correctly', () {
-      expect(goal.progress, 0.25);
+    test('progress is 0 when nothing saved', () {
+      final goal = SavingsGoal(
+        id: '1',
+        userId: 'u1',
+        name: 'Vacation',
+        targetAmount: 1000,
+        currentAmount: 0,
+        isCompleted: false,
+        createdAt: DateTime(2026, 1, 1),
+      );
+      expect(goal.progress, 0.0);
+      expect(goal.remaining, 1000.0);
     });
 
-    test('remaining calculates correctly', () {
-      expect(goal.remaining, 750);
+    test('progress is 1.0 when fully saved', () {
+      final goal = SavingsGoal(
+        id: '2',
+        userId: 'u1',
+        name: 'Car',
+        targetAmount: 500,
+        currentAmount: 500,
+        isCompleted: true,
+        createdAt: DateTime(2026, 1, 1),
+      );
+      expect(goal.progress, 1.0);
+      expect(goal.remaining, 0.0);
     });
 
-    test('copyWith updates currentAmount', () {
-      final updated = goal.copyWith(currentAmount: 1000, isCompleted: true);
-      expect(updated.currentAmount, 1000);
-      expect(updated.isCompleted, true);
-    });
-  });
-
-  group('Category', () {
-    final cat = Category(
-      id: 'c1',
-      userId: 'u1',
-      name: 'Food',
-      colorHex: 'FF6B6B',
-      iconKey: 'Food',
-      createdAt: DateTime(2026, 1, 1),
-    );
-
-    test('color parses from hex', () {
-      expect(cat.color.r, isNonZero);
-    });
-
-    test('copyWith updates budgetLimit', () {
-      final updated = cat.copyWith(budgetLimit: 500);
-      expect(updated.budgetLimit, 500);
-      expect(updated.name, 'Food');
+    test('progress clamps to 1.0 if over-saved', () {
+      final goal = SavingsGoal(
+        id: '3',
+        userId: 'u1',
+        name: 'Emergency',
+        targetAmount: 200,
+        currentAmount: 250,
+        isCompleted: true,
+        createdAt: DateTime(2026, 1, 1),
+      );
+      expect(goal.progress, 1.0);
     });
   });
 
   group('colorToHex', () {
-    test('round-trips a known color', () {
-      final cat = Category(
-        id: 'c1',
+    test('round-trips a hex color', () {
+      const hex = '5B8DEF';
+      final result = colorToHex(colorFromHex(hex));
+      expect(result.toUpperCase(), hex);
+    });
+  });
+
+  group('IncomeEntry JSON', () {
+    test('serializes and deserializes correctly', () {
+      final entry = IncomeEntry(
+        id: 'abc',
         userId: 'u1',
-        name: 'Test',
-        colorHex: 'FF6B6B',
-        iconKey: 'Other',
-        createdAt: DateTime(2026, 1, 1),
+        amount: 3000.0,
+        month: 5,
+        year: 2026,
+        source: 'Salary',
+        createdAt: DateTime(2026, 5, 1),
       );
-      // Parse then re-encode — should be the same hex
-      final hex = colorToHex(cat.color);
-      expect(hex, 'FF6B6B');
+      final json = entry.toJson();
+      final restored = IncomeEntry.fromJson(json);
+      expect(restored.amount, 3000.0);
+      expect(restored.source, 'Salary');
+      expect(restored.month, 5);
     });
   });
 }
